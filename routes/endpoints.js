@@ -13,8 +13,6 @@ route.get('/order_items/:limit?', async (req, res) => {
     limit = parseInt(req.params.limit);
   }
 
-  console.log(limit);
-
   //destructure sort query
   const { sortBy = 'price', offset = 1 } = req.query;
   console.log(sortBy);
@@ -70,7 +68,7 @@ route.delete('/delete_order_items/:id', async (req, res) => {
   }
 
   if (!order) {
-    return res.status(400).json({ message: 'order does not exist' });
+    return res.status(404).json({ message: 'order does not exist' });
   }
 
   //if order exist, delete one
@@ -79,7 +77,7 @@ route.delete('/delete_order_items/:id', async (req, res) => {
       .collection('orders')
       .deleteOne({ _id: new ObjectId(req.params.id) });
   } catch (error) {
-    return res.status(400).json({ message: 'something went wrong' });
+    return res.status(500).json({ message: 'something went wrong' });
   }
   return res.status(200).json({ message: 'order sucessfully deleted' });
 });
@@ -87,6 +85,10 @@ route.delete('/delete_order_items/:id', async (req, res) => {
 route.put('/account', async (req, res) => {
   let newRecord;
   const { city, state } = req.body;
+
+  if (!city) {
+    return res.status(400).json({ message: 'city is required in the body' });
+  }
 
   let checkCity = state
     ? { seller_city: city, seller_state: state }
@@ -103,7 +105,7 @@ route.put('/account', async (req, res) => {
     );
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ message: 'something went wrong' });
+    return res.status(500).json({ message: 'something went wrong' });
   }
   console.log(newRecord.value);
   const { _id, seller_id, seller_zip_code_prefix, ...record } = newRecord.value;
