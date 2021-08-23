@@ -1,5 +1,3 @@
-import database from './database_connection.js';
-
 const verifyUser = async (req, res, next) => {
   // check for basic auth header
   if (
@@ -15,7 +13,10 @@ const verifyUser = async (req, res, next) => {
     'ascii'
   );
   const [username, password] = credentials.split(':');
-  const user = await authenticate({ username, password });
+  const user = await authenticate(
+    { username, password },
+    req.app.locals.collection
+  );
   if (!user) {
     return res
       .status(401)
@@ -28,7 +29,7 @@ const verifyUser = async (req, res, next) => {
   next();
 };
 
-const authenticate = async ({ username, password }) => {
+const authenticate = async ({ username, password }, database) => {
   let user = null;
   // check for user
   await database
@@ -47,4 +48,4 @@ const authenticate = async ({ username, password }) => {
   }
 };
 
-export { verifyUser };
+module.exports = { verifyUser };

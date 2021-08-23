@@ -1,10 +1,10 @@
-import express from 'express';
-import { ObjectId } from 'mongodb';
-import database from '../helpers/database_connection.js';
+const express = require('express');
+const { ObjectId } = require('mongodb');
 
 const route = express.Router();
 
 route.get('/order_items/:limit?', async (req, res) => {
+  const database = req.app.locals.collection;
   let collection;
   let count;
   let limit = 20;
@@ -15,7 +15,6 @@ route.get('/order_items/:limit?', async (req, res) => {
 
   //destructure sort query
   const { sortBy = 'price', offset = 1 } = req.query;
-  console.log(sortBy);
 
   let sortVariable =
     sortBy === 'price' ? { price: 1 } : { seller_zip_code_prefix: 1 };
@@ -56,6 +55,7 @@ route.get('/order_items/:limit?', async (req, res) => {
 });
 
 route.delete('/delete_order_items/:id', async (req, res) => {
+  const database = req.app.locals.collection;
   let order;
 
   //check if order exist
@@ -83,6 +83,7 @@ route.delete('/delete_order_items/:id', async (req, res) => {
 });
 
 route.put('/account', async (req, res) => {
+  const database = req.app.locals.collection;
   let newRecord;
   const { city, state } = req.body;
 
@@ -96,23 +97,28 @@ route.put('/account', async (req, res) => {
 
   //update record
   try {
-    newRecord = await database.collection('sellers').findOneAndUpdate(
-      { seller_id: req.user.username },
-      { $set: { ...checkCity } },
-      {
-        returnNewDocument: true,
-      }
-    );
+    await database
+      .collection('sellers')
+      .findOneAndUpdate(
+        { seller_id: req.user.username },
+        { $set: { ...checkCity } },
+        { upsert: true, returnOriginal: false, returnNewDocument: true }
+      );
+
+    await database
+      .collection('sellers')
+      .findOne({ seller_id: req.user.username })
+      .then((doc) => (newRecord = doc));
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: 'something went wrong' });
   }
-  console.log(newRecord.value);
-  const { _id, seller_id, seller_zip_code_prefix, ...record } = newRecord.value;
+
+  const { _id, seller_id, seller_zip_code_prefix, ...record } = newRecord;
   return res.status(200).json({
     message: 'record successfully updated',
     updated_record: record,
   });
 });
 
-export default route;
+module.exports = route;

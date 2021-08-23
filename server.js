@@ -1,17 +1,20 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import bodyParser from 'body-parser';
+const express = require('express');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const { MongoClient } = require('mongodb');
 
 dotenv.config();
+let server;
 
 //local imports
-import database from './helpers/database_connection.js';
-import endpoints from './routes/endpoints.js';
-import { verifyUser } from './helpers/authFunctions.js';
+const endpoints = require('./routes/endpoints.js');
+const { verifyUser } = require('./helpers/authFunctions.js');
 
 const app = express();
 app.use(bodyParser.json());
+
+//
 
 const corsOptions = {
   origin: '*',
@@ -25,16 +28,15 @@ app.use(verifyUser);
 
 app.use('/', endpoints);
 
-// app.get('/', (req, res) => {
-//   let result = database
-//     .collection('orders')
-//     .findOne({ seller_id: '3442f8959a84dea7ee197c632cb2df15' })
-//     .then((res) => console.log(res));
-
-//   return res.status(200).json({ result: 'okau' });
-// });
-
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => console.log('app running on port 5000'));
+server = app.listen(PORT, async () => {
+  await MongoClient.connect(
+    `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@cluster0.egm3f.mongodb.net/${process.env.DATABASE_NAME}?retryWrites=true&w=majority`
+  ).then((client) => {
+    const db = client.db(`${process.env.DATABASE_NAME}`);
+    app.locals.collection = db;
+  });
+  console.log(`app is running on port ${PORT}`);
+});
 
-export default server;
+module.exports = server;
