@@ -3,6 +3,8 @@
 This is solution to a node js [Test](https://www.notion.so/Task-Node-js-e5ff906068ac4b8abc245d33e7db5278) providing a REST
 API which is beign deployed on [Heroku](https://simplebks.herokuapp.com). The the entry point to the application is `server.js` file.
 
+To access any endpoint basic Authentication via HTTP using the seller_id and seller_zip_code_prefix from the `olist_sellers_dataset` collection as username and password respectively has to be set.
+
 ## Install
 
     npm install
@@ -142,6 +144,6 @@ still working on the tests, Im have issues with running tests with jest, not wit
 
 ## PS
 
-`please note that in the order collection, the fields: price and shipping_limit_date should be of type long and date respectively but were saved as strings, hence sorting might work function appropriately, I tried to convert the values but convert was not available on tier of atlas`
+`please note that in the order collection, the fields: price and shipping_limit_date should be of type long and date respectively but were saved as strings, hence sorting might not function appropriately, I tried to convert the values but convert was not available on tier of atlas`
 
 ![error](./helpers/error.PNG)
