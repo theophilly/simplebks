@@ -14,7 +14,7 @@ route.get('/order_items/:limit?', async (req, res) => {
   }
 
   //destructure sort query
-  const { sortBy = 'price', offset = 1 } = req.query;
+  const { sortBy = 'shipping_limit_date', offset = 1 } = req.query;
 
   let sortVariable =
     sortBy === 'price' ? { price: 1 } : { seller_zip_code_prefix: 1 };
@@ -51,10 +51,12 @@ route.get('/order_items/:limit?', async (req, res) => {
     .toArray()
     .then((res) => (count = [...res].length));
 
-  return res.status(200).json({ data: collection, limit, offset, count });
+  return res
+    .status(200)
+    .json({ data: collection, limit, offset, total: count });
 });
 
-route.delete('/delete_order_items/:id', async (req, res) => {
+route.delete('/order_items/:id', async (req, res) => {
   const database = req.app.locals.collection;
   let order;
 

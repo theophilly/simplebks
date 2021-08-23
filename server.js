@@ -14,8 +14,6 @@ const { verifyUser } = require('./helpers/authFunctions.js');
 const app = express();
 app.use(bodyParser.json());
 
-//
-
 const corsOptions = {
   origin: '*',
   credentials: true, //access-control-allow-credentials:true
@@ -26,6 +24,7 @@ app.use(cors(corsOptions));
 // use basic HTTP auth to secure the api
 app.use(verifyUser);
 
+//routes
 app.use('/', endpoints);
 
 const PORT = process.env.PORT || 5000;
