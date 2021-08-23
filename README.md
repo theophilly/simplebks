@@ -143,4 +143,5 @@ still working on the tests, Im have issues with running tests with jest, not wit
 ## PS
 
 `please note that in the order collection, the fields: price and shipping_limit_date should be of type long and date respectively but were saved as strings, hence sorting might work function appropriately, I tried to convert the values but convert was not available on tier of atlas`
-![error](helpers/error.png)
+
+![error](./helpers/error.PNG)
